@@ -92,8 +92,7 @@ public class Plotter extends View {
     public boolean onTouchEvent(MotionEvent event) {
         return super.onTouchEvent(event);
     }
-
-    public void setRowCol(int row, int col) {
+   public void setRowCol(int row, int col) {
         this.numColumns = col;
         this.numRows = row;
         calculateDimensions();
@@ -106,41 +105,47 @@ public class Plotter extends View {
         }
 
         cellWidth = getWidth() / numColumns;
-        cellHeight = getWidth()/numColumns;
+        cellHeight = getHeight() / numColumns;
         invalidate();
     }
 
 
     public void setPlots(List<Integer> plots) {
         this.plots = plots;
-        points = new float[plots.size()*2];
+        points = new float[plots.size() * 2];
     }
 
 
-    private void drawMatrix(int width, int height, Canvas canvas){
+    private void drawMatrix(int width, int height, Canvas canvas) {
 
-        for (int i = 0; i <= numColumns; i++)
-            canvas.drawLine((i * cellWidth)+correction, 0, (i * cellWidth)+correction, height, greyPaint);
-
+        for (int i = 0; i <= numColumns; i++) {
+            canvas.drawLine((i * cellWidth), 0, (i * cellWidth), height, greyPaint);
+          //  canvas.drawText("", (i * cellWidth), height-20, textPaint);
+        }
 
         for (int i = 0; i <= numRows; i++)
-            canvas.drawLine(0, (i * cellHeight)+correction, width, (i * cellHeight)+correction, greyPaint);
+            canvas.drawLine(0, (i * cellHeight), width, (i * cellHeight), greyPaint);
 
     }
 
 
-    private void plotGraph(int width, int height, Canvas canvas){
+    private void plotGraph(int width, int height, Canvas canvas) {
 
         gradientPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
-        Shader shader = new LinearGradient(0, 0, 0, 500, getResources().getColor(R.color.colorBlue),  getResources().getColor(R.color.colorGreen), Shader.TileMode.MIRROR /*or REPEAT*/);
+        Shader shader = new LinearGradient(0, 0, 0, 500, getResources().getColor(R.color.green), getResources().getColor(R.color.green), Shader.TileMode.MIRROR /*or REPEAT*/);
         gradientPaint.setShader(shader);
 
 
-        for(int i=0, j=0; i<plots.size(); i++, j+=2){
-            canvas.drawCircle(inBoundX(i)+correction+cellWidth, inBoundY(i, getWidth()),10, gradientPaint);
-            points[j] = inBoundX(i)+correction+cellWidth;
-            points[j+1] = inBoundY(i, getWidth());
+        for (int i = 0, j = 0; i < plots.size(); i++, j += 2) {
+
+            canvas.drawCircle(inBoundX(i) + cellWidth, inBoundY(i, getHeight()), 10, gradientPaint);
+            points[j] = inBoundX(i) + cellWidth;
+            points[j + 1] = inBoundY(i, getHeight());
+
+
+           // canvas.drawText("1 mois", inBoundX(i) + cellWidth, inBoundY(i, getHeight()), textPaint);
+
         }
 
         gradientPaint.setStyle(Paint.Style.STROKE);
@@ -151,16 +156,16 @@ public class Plotter extends View {
 
     private void drawLines(Canvas canvas) {
 
-        if (points.length<=1)
+        if (points.length <= 1)
             return;
 
-        Path path =  new Path();
+        Path path = new Path();
 
         //This is to move the cursor
         path.moveTo(0, getWidth());
 
-        for (int i = 0; i<points.length; i+=2){
-            path.lineTo(points[i], points[i+1]);
+        for (int i = 0; i < points.length; i += 2) {
+            path.lineTo(points[i], points[i + 1]);
 
         }
 
@@ -170,32 +175,32 @@ public class Plotter extends View {
     }
 
 
-    private float inBoundX(int value){
-        int perPlot = getWidth()/plots.size() ;
+    private float inBoundX(int value) {
+        int perPlot = getWidth() / plots.size();
+        perPlot = perPlot - 10;
 
-        return perPlot*value;
+        return perPlot * value;
     }
 
-    private float inBoundY(int i, int height){
+    private float inBoundY(int i, int height) {
 
-        return (float) plots.get(i) * getWidth() / (float) maxValue();
+        //return (float) plots.get(i) * getWidth() / (float)  maxValue();
+        return (float) getHeight() - plots.get(i) * getWidth() / (float) maxValue();
     }
 
 
-    private float maxValue(){
+    private float maxValue() {
         int max = plots.get(0);
 
 
-        for(Integer value: plots)
-            if(value>max){
+        for (Integer value : plots)
+            if (value > max) {
                 max = value;
             }
 
 
-        return max;
+        return max + 10;
     }
-
-
 
 
 }
